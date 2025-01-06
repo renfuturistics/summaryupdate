@@ -32,14 +32,19 @@ export default async function ({ req, res, log, error }: any) {
     .setKey(appwriteConfig.apiKey);
 
   try {
+    // Check if the event and data are present in the request variables
     const event = req.variables["APPWRITE_FUNCTION_EVENT"] || "";
     const payload = JSON.parse(
       req.variables["APPWRITE_FUNCTION_EVENT_DATA"] || "{}"
     );
 
-    // Ensure the event is for your target collection
+    // Log event and payload for debugging purposes
+    log("Event:", event);
+    log("Payload:", payload);
+
+    // Check if the event includes your collection and event type
     if (
-      event.includes("collections.YOUR_USER_COURSES_COLLECTION_ID.documents")
+      event.includes(`collections.${appwriteConfig.userCoursesCollectionId}.documents`)
     ) {
       const userId = payload.user;
       const courseId = payload.course;
@@ -87,9 +92,9 @@ export default async function ({ req, res, log, error }: any) {
         );
       }
 
-      return  res.json({ success: true });
+      return res.json({ success: true });
     } else {
-        return    res.json({
+      return res.json({
         success: false,
         message: "Event not relevant to this function",
       });
@@ -97,6 +102,6 @@ export default async function ({ req, res, log, error }: any) {
   } catch (error: any) {
     log(error);
     console.error("Error in growth summary function:", error);
-    return   res.json({ success: false, error: error.message });
+    return res.json({ success: false, error: error.message });
   }
 }

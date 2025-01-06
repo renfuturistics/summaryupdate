@@ -79,7 +79,10 @@ function default_1(_a) {
                     _c.trys.push([1, 9, , 10]);
                     event_1 = req.variables["APPWRITE_FUNCTION_EVENT"] || "";
                     payload = JSON.parse(req.variables["APPWRITE_FUNCTION_EVENT_DATA"] || "{}");
-                    if (!event_1.includes("collections.YOUR_USER_COURSES_COLLECTION_ID.documents")) return [3 /*break*/, 7];
+                    // Log event and payload for debugging purposes
+                    log("Event:", event_1);
+                    log("Payload:", payload);
+                    if (!event_1.includes("collections.".concat(exports.appwriteConfig.userCoursesCollectionId, ".documents"))) return [3 /*break*/, 7];
                     userId = payload.user;
                     courseId = payload.course;
                     completedLessons = payload.completedLessons || 0;
