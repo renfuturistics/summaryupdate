@@ -63,7 +63,7 @@ exports.appwriteConfig = {
 };
 function default_1(_a) {
     return __awaiter(this, arguments, void 0, function (_b) {
-        var client, databases;
+        var client, databases, responseMessage;
         var req = _b.req, res = _b.res, log = _b.log, error = _b.error;
         return __generator(this, function (_c) {
             client = new node_appwrite_1.Client();
@@ -72,8 +72,18 @@ function default_1(_a) {
                 .setEndpoint(exports.appwriteConfig.endpoint)
                 .setProject(exports.appwriteConfig.projectId)
                 .setKey(exports.appwriteConfig.apiKey);
-            log(res);
-            return [2 /*return*/, res.json("hello world")];
+            try {
+                // Log the incoming request
+                log("Incoming request:", req);
+                responseMessage = { message: "Hello World" };
+                log("Response to be sent:", responseMessage);
+                return [2 /*return*/, res.json(responseMessage)]; // Send response back to the client
+            }
+            catch (err) {
+                log("Error:", err);
+                return [2 /*return*/, res.json({ error: err.message })]; // Handle any errors
+            }
+            return [2 /*return*/];
         });
     });
 }
