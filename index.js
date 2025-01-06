@@ -63,27 +63,72 @@ exports.appwriteConfig = {
 };
 function default_1(_a) {
     return __awaiter(this, arguments, void 0, function (_b) {
-        var client, databases, responseMessage;
+        var client, databases, payload, event_1, userId, courseId, completedLessons, isCompleted, growthSummaryResponse, growthSummary, error_1;
         var req = _b.req, res = _b.res, log = _b.log, error = _b.error;
         return __generator(this, function (_c) {
-            client = new node_appwrite_1.Client();
-            databases = new node_appwrite_1.Databases(client);
-            client
-                .setEndpoint(exports.appwriteConfig.endpoint)
-                .setProject(exports.appwriteConfig.projectId)
-                .setKey(exports.appwriteConfig.apiKey);
-            try {
-                // Log the incoming request
-                log("Incoming request:", req);
-                responseMessage = { message: "Hello World" };
-                log("Response to be sent:", responseMessage);
-                return [2 /*return*/, res.json(responseMessage)]; // Send response back to the client
+            switch (_c.label) {
+                case 0:
+                    client = new node_appwrite_1.Client();
+                    databases = new node_appwrite_1.Databases(client);
+                    client
+                        .setEndpoint(exports.appwriteConfig.endpoint)
+                        .setProject(exports.appwriteConfig.projectId)
+                        .setKey(exports.appwriteConfig.apiKey);
+                    _c.label = 1;
+                case 1:
+                    _c.trys.push([1, 9, , 10]);
+                    payload = req.body || {};
+                    log("Payload:", payload); // Log the payload to check if it contains the expected data
+                    event_1 = req.headers["x-appwrite-event"] || "";
+                    log("Event:", event_1);
+                    if (!event_1.includes("collections.".concat(exports.appwriteConfig.userCoursesCollectionId, ".documents"))) return [3 /*break*/, 7];
+                    userId = payload.user;
+                    courseId = payload.course;
+                    completedLessons = payload.completedLessons || 0;
+                    isCompleted = payload.isCompleted || false;
+                    return [4 /*yield*/, databases.listDocuments(exports.appwriteConfig.databaseId, exports.appwriteConfig.grownthCollectionId, [node_appwrite_1.Query.equal("userId", userId)])];
+                case 2:
+                    growthSummaryResponse = _c.sent();
+                    growthSummary = growthSummaryResponse.documents[0];
+                    if (!growthSummary) return [3 /*break*/, 4];
+                    // Update existing growth summary
+                    return [4 /*yield*/, databases.updateDocument(exports.appwriteConfig.databaseId, exports.appwriteConfig.grownthCollectionId, growthSummary.$id, {
+                            totalLessonsCompleted: growthSummary.totalLessonsCompleted + completedLessons,
+                            totalCoursesCompleted: growthSummary.totalCoursesCompleted + (isCompleted ? 1 : 0),
+                            lastActivityDate: new Date().toISOString(),
+                            daysActive: growthSummary.daysActive + 1,
+                        })];
+                case 3:
+                    // Update existing growth summary
+                    _c.sent();
+                    return [3 /*break*/, 6];
+                case 4: 
+                // Create a new growth summary record
+                return [4 /*yield*/, databases.createDocument(exports.appwriteConfig.databaseId, exports.appwriteConfig.grownthCollectionId, node_appwrite_1.ID.unique(), {
+                        userId: userId,
+                        totalLessonsCompleted: completedLessons,
+                        totalCoursesCompleted: isCompleted ? 1 : 0,
+                        totalTimeSpent: 0, // Set to zero or calculate from other data
+                        lastActivityDate: new Date().toISOString(),
+                        daysActive: 1,
+                    })];
+                case 5:
+                    // Create a new growth summary record
+                    _c.sent();
+                    _c.label = 6;
+                case 6: return [2 /*return*/, res.json({ success: true })];
+                case 7: return [2 /*return*/, res.json({
+                        success: false,
+                        message: "Event not relevant to this function",
+                    })];
+                case 8: return [3 /*break*/, 10];
+                case 9:
+                    error_1 = _c.sent();
+                    log(error_1);
+                    console.error("Error in growth summary function:", error_1);
+                    return [2 /*return*/, res.json({ success: false, error: error_1.message })];
+                case 10: return [2 /*return*/];
             }
-            catch (err) {
-                log("Error:", err);
-                return [2 /*return*/, res.json({ error: err.message })]; // Handle any errors
-            }
-            return [2 /*return*/];
         });
     });
 }
