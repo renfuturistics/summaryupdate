@@ -87,9 +87,9 @@ export default async function ({ req, res, log, error }: any) {
         );
       }
 
-      res.json({ success: true });
+      return  res.json({ success: true });
     } else {
-      res.json({
+        return    res.json({
         success: false,
         message: "Event not relevant to this function",
       });
@@ -97,6 +97,6 @@ export default async function ({ req, res, log, error }: any) {
   } catch (error: any) {
     log(error);
     console.error("Error in growth summary function:", error);
-    res.json({ success: false, error: error.message });
+    return   res.json({ success: false, error: error.message });
   }
 }

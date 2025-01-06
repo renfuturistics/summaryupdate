@@ -61,11 +61,12 @@ exports.appwriteConfig = {
     subscriptionCollectionId: "6773c7bd000ca5f2a632",
     apiKey: "standard_3535ea30bed6d040d260e48d02bab123e399e6e23d584cdaf42260cebd3c45a1682b56009c03fd199d7b6fd7c9e8bb05d9e22fa75016d58fc68d284acbea3d6d1299df0376245f696d0d97119b4fe030c3bd4749feac07d9b23c98ad7c83c8b4c52d61c2a7ad29bb57b19b491d1f6d8f4a1100b85bbe909e2c3bdd93f85870c3",
 };
-function default_1(req, res) {
-    return __awaiter(this, void 0, void 0, function () {
+function default_1(_a) {
+    return __awaiter(this, arguments, void 0, function (_b) {
         var client, databases, event_1, payload, userId, courseId, completedLessons, isCompleted, growthSummaryResponse, growthSummary, error_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var req = _b.req, res = _b.res, log = _b.log, error = _b.error;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
                     client = new node_appwrite_1.Client();
                     databases = new node_appwrite_1.Databases(client);
@@ -73,9 +74,9 @@ function default_1(req, res) {
                         .setEndpoint(exports.appwriteConfig.endpoint)
                         .setProject(exports.appwriteConfig.projectId)
                         .setKey(exports.appwriteConfig.apiKey);
-                    _a.label = 1;
+                    _c.label = 1;
                 case 1:
-                    _a.trys.push([1, 9, , 10]);
+                    _c.trys.push([1, 9, , 10]);
                     event_1 = req.variables["APPWRITE_FUNCTION_EVENT"] || "";
                     payload = JSON.parse(req.variables["APPWRITE_FUNCTION_EVENT_DATA"] || "{}");
                     if (!event_1.includes("collections.YOUR_USER_COURSES_COLLECTION_ID.documents")) return [3 /*break*/, 7];
@@ -85,7 +86,7 @@ function default_1(req, res) {
                     isCompleted = payload.isCompleted || false;
                     return [4 /*yield*/, databases.listDocuments(exports.appwriteConfig.databaseId, exports.appwriteConfig.grownthCollectionId, [node_appwrite_1.Query.equal("userId", userId)])];
                 case 2:
-                    growthSummaryResponse = _a.sent();
+                    growthSummaryResponse = _c.sent();
                     growthSummary = growthSummaryResponse.documents[0];
                     if (!growthSummary) return [3 /*break*/, 4];
                     // Update existing growth summary
@@ -97,7 +98,7 @@ function default_1(req, res) {
                         })];
                 case 3:
                     // Update existing growth summary
-                    _a.sent();
+                    _c.sent();
                     return [3 /*break*/, 6];
                 case 4: 
                 // Create a new growth summary record
@@ -111,23 +112,19 @@ function default_1(req, res) {
                     })];
                 case 5:
                     // Create a new growth summary record
-                    _a.sent();
-                    _a.label = 6;
-                case 6:
-                    res.json({ success: true });
-                    return [3 /*break*/, 8];
-                case 7:
-                    res.json({
+                    _c.sent();
+                    _c.label = 6;
+                case 6: return [2 /*return*/, res.json({ success: true })];
+                case 7: return [2 /*return*/, res.json({
                         success: false,
                         message: "Event not relevant to this function",
-                    });
-                    _a.label = 8;
+                    })];
                 case 8: return [3 /*break*/, 10];
                 case 9:
-                    error_1 = _a.sent();
+                    error_1 = _c.sent();
+                    log(error_1);
                     console.error("Error in growth summary function:", error_1);
-                    res.json({ success: false, error: error_1.message });
-                    return [3 /*break*/, 10];
+                    return [2 /*return*/, res.json({ success: false, error: error_1.message })];
                 case 10: return [2 /*return*/];
             }
         });
