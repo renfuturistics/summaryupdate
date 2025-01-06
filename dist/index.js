@@ -42,6 +42,7 @@ function default_1(_a) {
             .setEndpoint(exports.appwriteConfig.endpoint)
             .setProject(exports.appwriteConfig.projectId)
             .setKey(exports.appwriteConfig.apiKey);
+        log(res);
         try {
             // Check if the event and data are present in the request variables
             const event = req.variables["APPWRITE_FUNCTION_EVENT"] || "";

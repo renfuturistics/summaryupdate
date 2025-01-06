@@ -30,7 +30,7 @@ export default async function ({ req, res, log, error }: any) {
     .setEndpoint(appwriteConfig.endpoint)
     .setProject(appwriteConfig.projectId)
     .setKey(appwriteConfig.apiKey);
-
+log(res)
   try {
     // Check if the event and data are present in the request variables
     const event = req.variables["APPWRITE_FUNCTION_EVENT"] || "";

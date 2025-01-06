@@ -74,6 +74,7 @@ function default_1(_a) {
                         .setEndpoint(exports.appwriteConfig.endpoint)
                         .setProject(exports.appwriteConfig.projectId)
                         .setKey(exports.appwriteConfig.apiKey);
+                    log(res);
                     _c.label = 1;
                 case 1:
                     _c.trys.push([1, 9, , 10]);
