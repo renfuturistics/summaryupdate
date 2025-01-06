@@ -63,7 +63,7 @@ exports.appwriteConfig = {
 };
 function default_1(_a) {
     return __awaiter(this, arguments, void 0, function (_b) {
-        var client, databases, payload, event_1, userId, courseId, completedLessons, isCompleted, growthSummaryResponse, growthSummary, error_1;
+        var client, databases, payload, event_1, userId, courseId, completedLessons, isCompleted, growthSummaryResponse, growthSummary, err_1;
         var req = _b.req, res = _b.res, log = _b.log, error = _b.error;
         return __generator(this, function (_c) {
             switch (_c.label) {
@@ -78,10 +78,10 @@ function default_1(_a) {
                 case 1:
                     _c.trys.push([1, 9, , 10]);
                     payload = req.body || {};
-                    log("Payload:", payload); // Log the payload to check if it contains the expected data
                     event_1 = req.headers["x-appwrite-event"] || "";
-                    log("Event:", event_1);
                     if (!event_1.includes("collections.".concat(exports.appwriteConfig.userCoursesCollectionId, ".documents"))) return [3 /*break*/, 7];
+                    log("Event:", event_1);
+                    log("Payload:", payload);
                     userId = payload.user;
                     courseId = payload.course;
                     completedLessons = payload.completedLessons || 0;
@@ -123,10 +123,10 @@ function default_1(_a) {
                     })];
                 case 8: return [3 /*break*/, 10];
                 case 9:
-                    error_1 = _c.sent();
-                    log(error_1);
-                    console.error("Error in growth summary function:", error_1);
-                    return [2 /*return*/, res.json({ success: false, error: error_1.message })];
+                    err_1 = _c.sent();
+                    log(err_1);
+                    error("Error in growth summary function:", err_1);
+                    return [2 /*return*/, res.json({ success: false, error: err_1.message })];
                 case 10: return [2 /*return*/];
             }
         });
