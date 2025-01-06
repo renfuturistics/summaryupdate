@@ -116,8 +116,8 @@ function default_1(_a) {
                     // Create a new growth summary record
                     _c.sent();
                     _c.label = 6;
-                case 6: return [2 /*return*/, res.status(201).json({ success: true })];
-                case 7: return [2 /*return*/, res.status(400).json({
+                case 6: return [2 /*return*/, res.json({ success: true })];
+                case 7: return [2 /*return*/, res.json({
                         success: false,
                         message: "Event not relevant to this function",
                     })];
@@ -126,7 +126,7 @@ function default_1(_a) {
                     err_1 = _c.sent();
                     log(err_1);
                     error("Error in growth summary function:", err_1);
-                    return [2 /*return*/, res.status(500).json({ success: false, error: err_1.message })];
+                    return [2 /*return*/, res.json({ success: false, error: err_1.message })];
                 case 10: return [2 /*return*/];
             }
         });
