@@ -22,7 +22,7 @@ export const appwriteConfig = {
   apiKey:
     "standard_3535ea30bed6d040d260e48d02bab123e399e6e23d584cdaf42260cebd3c45a1682b56009c03fd199d7b6fd7c9e8bb05d9e22fa75016d58fc68d284acbea3d6d1299df0376245f696d0d97119b4fe030c3bd4749feac07d9b23c98ad7c83c8b4c52d61c2a7ad29bb57b19b491d1f6d8f4a1100b85bbe909e2c3bdd93f85870c3",
 };
-export default async function (req: any, res: any) {
+export default async function ({ req, res, log, error }: any) {
   const client = new Client();
   const databases = new Databases(client);
 
@@ -95,6 +95,7 @@ export default async function (req: any, res: any) {
       });
     }
   } catch (error: any) {
+    log(error);
     console.error("Error in growth summary function:", error);
     res.json({ success: false, error: error.message });
   }
