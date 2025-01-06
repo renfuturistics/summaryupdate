@@ -37,19 +37,18 @@ export default async function ({ req, res, log, error }: any) {
     // Directly use req.body if the event is not found in req.variables
     const payload = req.body || {}; // Assuming the data is sent directly in the body of the request
 
- // Log the payload to check if it contains the expected data
+    // Log the payload to check if it contains the expected data
 
     // Check if the event includes your collection and event type
     const event = req.headers["x-appwrite-event"] || ""; // Alternatively, check headers for event info
-
 
     if (
       event.includes(
         `collections.${appwriteConfig.userCoursesCollectionId}.documents`
       )
     ) {
-        log("Event:", event);
-        log("Payload:", payload);
+      log("Event:", event);
+      log("Payload:", payload);
       const userId = payload.user;
       const courseId = payload.course;
       const completedLessons = payload.completedLessons || 0;
@@ -96,9 +95,9 @@ export default async function ({ req, res, log, error }: any) {
         );
       }
 
-      return res.json({ success: true });
+      return res.status(201).json({ success: true });
     } else {
-      return res.json({
+      return res.status(400).json({
         success: false,
         message: "Event not relevant to this function",
       });
@@ -106,6 +105,6 @@ export default async function ({ req, res, log, error }: any) {
   } catch (err: any) {
     log(err);
     error("Error in growth summary function:", err);
-    return res.json({ success: false, error: err.message });
+    return res.status(500).json({ success: false, error: err.message });
   }
 }
