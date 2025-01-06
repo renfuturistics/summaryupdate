@@ -63,74 +63,17 @@ exports.appwriteConfig = {
 };
 function default_1(_a) {
     return __awaiter(this, arguments, void 0, function (_b) {
-        var client, databases, event_1, payload, userId, courseId, completedLessons, isCompleted, growthSummaryResponse, growthSummary, error_1;
+        var client, databases;
         var req = _b.req, res = _b.res, log = _b.log, error = _b.error;
         return __generator(this, function (_c) {
-            switch (_c.label) {
-                case 0:
-                    client = new node_appwrite_1.Client();
-                    databases = new node_appwrite_1.Databases(client);
-                    client
-                        .setEndpoint(exports.appwriteConfig.endpoint)
-                        .setProject(exports.appwriteConfig.projectId)
-                        .setKey(exports.appwriteConfig.apiKey);
-                    log(res);
-                    _c.label = 1;
-                case 1:
-                    _c.trys.push([1, 9, , 10]);
-                    event_1 = req.variables["APPWRITE_FUNCTION_EVENT"] || "";
-                    payload = JSON.parse(req.variables["APPWRITE_FUNCTION_EVENT_DATA"] || "{}");
-                    // Log event and payload for debugging purposes
-                    log("Event:", event_1);
-                    log("Payload:", payload);
-                    if (!event_1.includes("collections.".concat(exports.appwriteConfig.userCoursesCollectionId, ".documents"))) return [3 /*break*/, 7];
-                    userId = payload.user;
-                    courseId = payload.course;
-                    completedLessons = payload.completedLessons || 0;
-                    isCompleted = payload.isCompleted || false;
-                    return [4 /*yield*/, databases.listDocuments(exports.appwriteConfig.databaseId, exports.appwriteConfig.grownthCollectionId, [node_appwrite_1.Query.equal("userId", userId)])];
-                case 2:
-                    growthSummaryResponse = _c.sent();
-                    growthSummary = growthSummaryResponse.documents[0];
-                    if (!growthSummary) return [3 /*break*/, 4];
-                    // Update existing growth summary
-                    return [4 /*yield*/, databases.updateDocument(exports.appwriteConfig.databaseId, exports.appwriteConfig.grownthCollectionId, growthSummary.$id, {
-                            totalLessonsCompleted: growthSummary.totalLessonsCompleted + completedLessons,
-                            totalCoursesCompleted: growthSummary.totalCoursesCompleted + (isCompleted ? 1 : 0),
-                            lastActivityDate: new Date().toISOString(),
-                            daysActive: growthSummary.daysActive + 1,
-                        })];
-                case 3:
-                    // Update existing growth summary
-                    _c.sent();
-                    return [3 /*break*/, 6];
-                case 4: 
-                // Create a new growth summary record
-                return [4 /*yield*/, databases.createDocument(exports.appwriteConfig.databaseId, exports.appwriteConfig.grownthCollectionId, node_appwrite_1.ID.unique(), {
-                        userId: userId,
-                        totalLessonsCompleted: completedLessons,
-                        totalCoursesCompleted: isCompleted ? 1 : 0,
-                        totalTimeSpent: 0, // Set to zero or calculate from other data
-                        lastActivityDate: new Date().toISOString(),
-                        daysActive: 1,
-                    })];
-                case 5:
-                    // Create a new growth summary record
-                    _c.sent();
-                    _c.label = 6;
-                case 6: return [2 /*return*/, res.json({ success: true })];
-                case 7: return [2 /*return*/, res.json({
-                        success: false,
-                        message: "Event not relevant to this function",
-                    })];
-                case 8: return [3 /*break*/, 10];
-                case 9:
-                    error_1 = _c.sent();
-                    log(error_1);
-                    console.error("Error in growth summary function:", error_1);
-                    return [2 /*return*/, res.json({ success: false, error: error_1.message })];
-                case 10: return [2 /*return*/];
-            }
+            client = new node_appwrite_1.Client();
+            databases = new node_appwrite_1.Databases(client);
+            client
+                .setEndpoint(exports.appwriteConfig.endpoint)
+                .setProject(exports.appwriteConfig.projectId)
+                .setKey(exports.appwriteConfig.apiKey);
+            log(res);
+            return [2 /*return*/, res.json("hello world")];
         });
     });
 }
