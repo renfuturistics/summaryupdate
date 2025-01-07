@@ -47,6 +47,22 @@ export default async function ({ req, res, log, error }: any) {
       const completedLessons = payload.completedLessons || 0;
       const isCompleted = payload.isCompleted || false;
 
+      // Fetch the existing user course document to compare changes
+      const existingCourseResponse = await databases.getDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.userCoursesCollectionId,
+        payload.$id
+      );
+
+      const previousCompletedLessons =
+        existingCourseResponse?.completedLessons || 0;
+
+      // Calculate lessons completed in this update
+      const newLessonsCompleted =
+        completedLessons > previousCompletedLessons
+          ? completedLessons - previousCompletedLessons
+          : 0;
+
       const growthSummaryResponse = await databases.listDocuments(
         appwriteConfig.databaseId,
         appwriteConfig.grownthCollectionId,
@@ -70,7 +86,7 @@ export default async function ({ req, res, log, error }: any) {
           growthSummary.$id,
           {
             totalLessonsCompleted:
-              growthSummary.totalLessonsCompleted + completedLessons,
+              growthSummary.totalLessonsCompleted + newLessonsCompleted,
             totalCoursesCompleted:
               growthSummary.totalCoursesCompleted + (isCompleted ? 1 : 0),
             lastActivityDate: new Date().toISOString(),
@@ -84,7 +100,7 @@ export default async function ({ req, res, log, error }: any) {
           ID.unique(),
           {
             userId,
-            totalLessonsCompleted: completedLessons,
+            totalLessonsCompleted: newLessonsCompleted,
             totalCoursesCompleted: isCompleted ? 1 : 0,
             totalTimeSpent: 0,
             lastActivityDate: new Date().toISOString(),

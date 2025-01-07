@@ -63,7 +63,7 @@ exports.appwriteConfig = {
 };
 function default_1(_a) {
     return __awaiter(this, arguments, void 0, function (_b) {
-        var client, databases, payload, event_1, userId, courseId, completedLessons, isCompleted, growthSummaryResponse, growthSummary, today, lastActivityDate, isNewDay, err_1;
+        var client, databases, payload, event_1, userId, courseId, completedLessons, isCompleted, existingCourseResponse, previousCompletedLessons, newLessonsCompleted, growthSummaryResponse, growthSummary, today, lastActivityDate, isNewDay, err_1;
         var req = _b.req, res = _b.res, log = _b.log, error = _b.error;
         return __generator(this, function (_c) {
             switch (_c.label) {
@@ -76,56 +76,63 @@ function default_1(_a) {
                         .setKey(exports.appwriteConfig.apiKey);
                     _c.label = 1;
                 case 1:
-                    _c.trys.push([1, 9, , 10]);
+                    _c.trys.push([1, 10, , 11]);
                     payload = req.body || {};
                     event_1 = req.headers["x-appwrite-event"] || "";
-                    if (!event_1.includes("collections.".concat(exports.appwriteConfig.userCoursesCollectionId, ".documents"))) return [3 /*break*/, 7];
+                    if (!event_1.includes("collections.".concat(exports.appwriteConfig.userCoursesCollectionId, ".documents"))) return [3 /*break*/, 8];
                     userId = payload.user;
                     courseId = payload.course;
                     completedLessons = payload.completedLessons || 0;
                     isCompleted = payload.isCompleted || false;
-                    return [4 /*yield*/, databases.listDocuments(exports.appwriteConfig.databaseId, exports.appwriteConfig.grownthCollectionId, [node_appwrite_1.Query.equal("userId", userId)])];
+                    return [4 /*yield*/, databases.getDocument(exports.appwriteConfig.databaseId, exports.appwriteConfig.userCoursesCollectionId, payload.$id)];
                 case 2:
+                    existingCourseResponse = _c.sent();
+                    previousCompletedLessons = (existingCourseResponse === null || existingCourseResponse === void 0 ? void 0 : existingCourseResponse.completedLessons) || 0;
+                    newLessonsCompleted = completedLessons > previousCompletedLessons
+                        ? completedLessons - previousCompletedLessons
+                        : 0;
+                    return [4 /*yield*/, databases.listDocuments(exports.appwriteConfig.databaseId, exports.appwriteConfig.grownthCollectionId, [node_appwrite_1.Query.equal("userId", userId)])];
+                case 3:
                     growthSummaryResponse = _c.sent();
                     growthSummary = growthSummaryResponse.documents[0];
                     today = new Date().toISOString().split("T")[0];
-                    if (!growthSummary) return [3 /*break*/, 4];
+                    if (!growthSummary) return [3 /*break*/, 5];
                     lastActivityDate = growthSummary.lastActivityDate
                         ? growthSummary.lastActivityDate.split("T")[0]
                         : null;
                     isNewDay = lastActivityDate !== today;
                     return [4 /*yield*/, databases.updateDocument(exports.appwriteConfig.databaseId, exports.appwriteConfig.grownthCollectionId, growthSummary.$id, {
-                            totalLessonsCompleted: growthSummary.totalLessonsCompleted + completedLessons,
+                            totalLessonsCompleted: growthSummary.totalLessonsCompleted + newLessonsCompleted,
                             totalCoursesCompleted: growthSummary.totalCoursesCompleted + (isCompleted ? 1 : 0),
                             lastActivityDate: new Date().toISOString(),
                             daysActive: growthSummary.daysActive + (isNewDay ? 1 : 0), // Increment daysActive only if it's a new day
                         })];
-                case 3:
+                case 4:
                     _c.sent();
-                    return [3 /*break*/, 6];
-                case 4: return [4 /*yield*/, databases.createDocument(exports.appwriteConfig.databaseId, exports.appwriteConfig.grownthCollectionId, node_appwrite_1.ID.unique(), {
+                    return [3 /*break*/, 7];
+                case 5: return [4 /*yield*/, databases.createDocument(exports.appwriteConfig.databaseId, exports.appwriteConfig.grownthCollectionId, node_appwrite_1.ID.unique(), {
                         userId: userId,
-                        totalLessonsCompleted: completedLessons,
+                        totalLessonsCompleted: newLessonsCompleted,
                         totalCoursesCompleted: isCompleted ? 1 : 0,
                         totalTimeSpent: 0,
                         lastActivityDate: new Date().toISOString(),
                         daysActive: 1, // First activity starts at 1 day
                     })];
-                case 5:
+                case 6:
                     _c.sent();
-                    _c.label = 6;
-                case 6: return [2 /*return*/, res.json({ success: true })];
-                case 7: return [2 /*return*/, res.json({
+                    _c.label = 7;
+                case 7: return [2 /*return*/, res.json({ success: true })];
+                case 8: return [2 /*return*/, res.json({
                         success: false,
                         message: "Event not relevant to this function",
                     })];
-                case 8: return [3 /*break*/, 10];
-                case 9:
+                case 9: return [3 /*break*/, 11];
+                case 10:
                     err_1 = _c.sent();
                     log(err_1);
                     error("Error in growth summary function:", err_1);
                     return [2 /*return*/, res.json({ success: false, error: err_1.message })];
-                case 10: return [2 /*return*/];
+                case 11: return [2 /*return*/];
             }
         });
     });
