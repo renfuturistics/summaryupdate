@@ -48,7 +48,7 @@ export default async function ({ req, res, log, error }: any) {
         completedLessons > previousCompletedLessons
           ? completedLessons - previousCompletedLessons
           : 0;
-
+log(newLessonsCompleted)
       const growthSummaryResponse = await databases.listDocuments(
         appwriteConfig.databaseId,
         appwriteConfig.grownthCollectionId,

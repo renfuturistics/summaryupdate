@@ -77,6 +77,7 @@ function default_1(_a) {
                     newLessonsCompleted = completedLessons > previousCompletedLessons
                         ? completedLessons - previousCompletedLessons
                         : 0;
+                    log(newLessonsCompleted);
                     return [4 /*yield*/, databases.listDocuments(exports.appwriteConfig.databaseId, exports.appwriteConfig.grownthCollectionId, [node_appwrite_1.Query.equal("userId", userId)])];
                 case 3:
                     growthSummaryResponse = _c.sent();
