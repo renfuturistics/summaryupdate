@@ -30,7 +30,7 @@ log(req)
       )
     ) {
       const userId = payload.user;
-      const courseId = payload.course;
+   
       const completedLessons = payload.completedLessons || 0;
       const isCompleted = payload.isCompleted || false;
 
@@ -40,7 +40,7 @@ log(req)
         appwriteConfig.userCoursesCollectionId,
         payload.$id
       );
-
+      log(existingCourseResponse)
       const previousCompletedLessons =
         existingCourseResponse?.completedLessons || 0;
 
@@ -49,7 +49,7 @@ log(req)
         completedLessons > previousCompletedLessons
           ? completedLessons - previousCompletedLessons
           : 0;
-log(newLessonsCompleted)
+
       const growthSummaryResponse = await databases.listDocuments(
         appwriteConfig.databaseId,
         appwriteConfig.grownthCollectionId,

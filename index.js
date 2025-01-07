@@ -49,7 +49,7 @@ exports.appwriteConfig = {
 };
 function default_1(_a) {
     return __awaiter(this, arguments, void 0, function (_b) {
-        var client, databases, payload, event_1, userId, courseId, completedLessons, isCompleted, existingCourseResponse, previousCompletedLessons, newLessonsCompleted, growthSummaryResponse, growthSummary, today, lastActivityDate, isNewDay, err_1;
+        var client, databases, payload, event_1, userId, completedLessons, isCompleted, existingCourseResponse, previousCompletedLessons, newLessonsCompleted, growthSummaryResponse, growthSummary, today, lastActivityDate, isNewDay, err_1;
         var req = _b.req, res = _b.res, log = _b.log, error = _b.error;
         return __generator(this, function (_c) {
             switch (_c.label) {
@@ -68,17 +68,16 @@ function default_1(_a) {
                     event_1 = req.headers["x-appwrite-event"] || "";
                     if (!event_1.includes("collections.".concat(exports.appwriteConfig.userCoursesCollectionId, ".documents"))) return [3 /*break*/, 8];
                     userId = payload.user;
-                    courseId = payload.course;
                     completedLessons = payload.completedLessons || 0;
                     isCompleted = payload.isCompleted || false;
                     return [4 /*yield*/, databases.getDocument(exports.appwriteConfig.databaseId, exports.appwriteConfig.userCoursesCollectionId, payload.$id)];
                 case 2:
                     existingCourseResponse = _c.sent();
+                    log(existingCourseResponse);
                     previousCompletedLessons = (existingCourseResponse === null || existingCourseResponse === void 0 ? void 0 : existingCourseResponse.completedLessons) || 0;
                     newLessonsCompleted = completedLessons > previousCompletedLessons
                         ? completedLessons - previousCompletedLessons
                         : 0;
-                    log(newLessonsCompleted);
                     return [4 /*yield*/, databases.listDocuments(exports.appwriteConfig.databaseId, exports.appwriteConfig.grownthCollectionId, [node_appwrite_1.Query.equal("userId", userId)])];
                 case 3:
                     growthSummaryResponse = _c.sent();
