@@ -44,11 +44,13 @@ log(req)
       const previousCompletedLessons =
         existingCourseResponse?.completedLessons || 0;
 
+        log(`completed lessons: ${completedLessons}`)
+        log(`previous lessons: ${previousCompletedLessons}`)
       // Calculate lessons completed in this update
       const newLessonsCompleted =
         completedLessons > previousCompletedLessons
           ? completedLessons - previousCompletedLessons
-          : 1;
+          : 0;
 
       const growthSummaryResponse = await databases.listDocuments(
         appwriteConfig.databaseId,
