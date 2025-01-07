@@ -67,7 +67,7 @@ function default_1(_a) {
                     payload = req.body || {};
                     event_1 = req.headers["x-appwrite-event"] || "";
                     if (!event_1.includes("collections.".concat(exports.appwriteConfig.userCoursesCollectionId, ".documents"))) return [3 /*break*/, 8];
-                    userId = payload.userId;
+                    userId = payload.user;
                     courseId = payload.course;
                     completedLessons = payload.completedLessons || 0;
                     isCompleted = payload.isCompleted || false;

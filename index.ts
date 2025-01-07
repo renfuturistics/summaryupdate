@@ -29,7 +29,7 @@ log(req)
         `collections.${appwriteConfig.userCoursesCollectionId}.documents`
       )
     ) {
-      const userId = payload.userId;
+      const userId = payload.user;
       const courseId = payload.course;
       const completedLessons = payload.completedLessons || 0;
       const isCompleted = payload.isCompleted || false;
