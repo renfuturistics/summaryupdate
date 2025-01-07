@@ -73,11 +73,10 @@ function default_1(_a) {
                     return [4 /*yield*/, databases.getDocument(exports.appwriteConfig.databaseId, exports.appwriteConfig.userCoursesCollectionId, payload.$id)];
                 case 2:
                     existingCourseResponse = _c.sent();
-                    log(existingCourseResponse);
                     previousCompletedLessons = (existingCourseResponse === null || existingCourseResponse === void 0 ? void 0 : existingCourseResponse.completedLessons) || 0;
                     newLessonsCompleted = completedLessons > previousCompletedLessons
                         ? completedLessons - previousCompletedLessons
-                        : 0;
+                        : 1;
                     return [4 /*yield*/, databases.listDocuments(exports.appwriteConfig.databaseId, exports.appwriteConfig.grownthCollectionId, [node_appwrite_1.Query.equal("userId", userId)])];
                 case 3:
                     growthSummaryResponse = _c.sent();
