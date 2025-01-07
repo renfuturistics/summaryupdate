@@ -18,10 +18,9 @@ export default async function ({ req, res, log, error }: any) {
     .setEndpoint(appwriteConfig.endpoint)
     .setProject(appwriteConfig.projectId)
     .setKey(appwriteConfig.apiKey);
-log(req)
+
   try {
     const payload = req.body || {};
-    
     const event = req.headers["x-appwrite-event"] || "";
 
     if (
@@ -30,72 +29,58 @@ log(req)
       )
     ) {
       const userId = payload.user;
-   
       const completedLessons = payload.completedLessons || 0;
       const isCompleted = payload.isCompleted || false;
+      const lastUpdatedAttribute = payload.lastUpdatedAttribute || "";
 
-      // Fetch the existing user course document to compare changes
-      const existingCourseResponse = await databases.getDocument(
-        appwriteConfig.databaseId,
-        appwriteConfig.userCoursesCollectionId,
-        payload.$id
-      );
-
-      const previousCompletedLessons =
-        existingCourseResponse?.completedLessons || 0;
-
-        log(`completed lessons: ${completedLessons}`)
-        log(`previous lessons: ${previousCompletedLessons}`)
-      // Calculate lessons completed in this update
-      const newLessonsCompleted =
-        completedLessons > previousCompletedLessons
-          ? completedLessons - previousCompletedLessons
-          : 0;
-
-      const growthSummaryResponse = await databases.listDocuments(
-        appwriteConfig.databaseId,
-        appwriteConfig.grownthCollectionId,
-        [Query.equal("userId", userId)]
-      );
-
-      let growthSummary = growthSummaryResponse.documents[0];
-      const today = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
-
-      if (growthSummary) {
-        const lastActivityDate = growthSummary.lastActivityDate
-          ? growthSummary.lastActivityDate.split("T")[0]
-          : null;
-
-        // Check if the user is active on a new day
-        const isNewDay = lastActivityDate !== today;
-
-        await databases.updateDocument(
+      // Proceed only if the updated attribute is "completedLessons"
+      if (lastUpdatedAttribute === "completedLessons") {
+        // Fetch the user's growth summary
+        const growthSummaryResponse = await databases.listDocuments(
           appwriteConfig.databaseId,
           appwriteConfig.grownthCollectionId,
-          growthSummary.$id,
-          {
-            totalLessonsCompleted:
-              growthSummary.totalLessonsCompleted + newLessonsCompleted,
-            totalCoursesCompleted:
-              growthSummary.totalCoursesCompleted + (isCompleted ? 1 : 0),
-            lastActivityDate: new Date().toISOString(),
-            daysActive: growthSummary.daysActive + (isNewDay ? 1 : 0), // Increment daysActive only if it's a new day
-          }
+          [Query.equal("userId", userId)]
         );
-      } else {
-        await databases.createDocument(
-          appwriteConfig.databaseId,
-          appwriteConfig.grownthCollectionId,
-          ID.unique(),
-          {
-            userId,
-            totalLessonsCompleted: newLessonsCompleted,
-            totalCoursesCompleted: isCompleted ? 1 : 0,
-            totalTimeSpent: 0,
-            lastActivityDate: new Date().toISOString(),
-            daysActive: 1, // First activity starts at 1 day
-          }
-        );
+
+        let growthSummary = growthSummaryResponse.documents[0];
+        const today = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
+
+        if (growthSummary) {
+          const lastActivityDate = growthSummary.lastActivityDate
+            ? growthSummary.lastActivityDate.split("T")[0]
+            : null;
+
+          // Check if the user is active on a new day
+          const isNewDay = lastActivityDate !== today;
+
+          // Update growth summary
+          await databases.updateDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.grownthCollectionId,
+            growthSummary.$id,
+            {
+              totalLessonsCompleted: growthSummary.totalLessonsCompleted + 1, // Increment by 1
+              totalCoursesCompleted: growthSummary.totalCoursesCompleted + (isCompleted ? 1 : 0),
+              lastActivityDate: new Date().toISOString(),
+              daysActive: growthSummary.daysActive + (isNewDay ? 1 : 0),
+            }
+          );
+        } else {
+          // Create new growth summary if none exists
+          await databases.createDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.grownthCollectionId,
+            ID.unique(),
+            {
+              userId,
+              totalLessonsCompleted: 1, // First lesson completed
+              totalCoursesCompleted: isCompleted ? 1 : 0,
+              totalTimeSpent: 0,
+              lastActivityDate: new Date().toISOString(),
+              daysActive: 1, // First activity starts at 1 day
+            }
+          );
+        }
       }
 
       return res.json({ success: true });
@@ -111,3 +96,4 @@ log(req)
     return res.json({ success: false, error: err.message });
   }
 }
+
