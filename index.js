@@ -60,13 +60,14 @@ function default_1(_a) {
                         .setEndpoint(exports.appwriteConfig.endpoint)
                         .setProject(exports.appwriteConfig.projectId)
                         .setKey(exports.appwriteConfig.apiKey);
+                    log(req);
                     _c.label = 1;
                 case 1:
                     _c.trys.push([1, 10, , 11]);
                     payload = req.body || {};
                     event_1 = req.headers["x-appwrite-event"] || "";
                     if (!event_1.includes("collections.".concat(exports.appwriteConfig.userCoursesCollectionId, ".documents"))) return [3 /*break*/, 8];
-                    userId = payload.user;
+                    userId = payload.userId;
                     courseId = payload.course;
                     completedLessons = payload.completedLessons || 0;
                     isCompleted = payload.isCompleted || false;

@@ -18,9 +18,10 @@ export default async function ({ req, res, log, error }: any) {
     .setEndpoint(appwriteConfig.endpoint)
     .setProject(appwriteConfig.projectId)
     .setKey(appwriteConfig.apiKey);
-
+log(req)
   try {
     const payload = req.body || {};
+    
     const event = req.headers["x-appwrite-event"] || "";
 
     if (
@@ -28,7 +29,7 @@ export default async function ({ req, res, log, error }: any) {
         `collections.${appwriteConfig.userCoursesCollectionId}.documents`
       )
     ) {
-      const userId = payload.user;
+      const userId = payload.userId;
       const courseId = payload.course;
       const completedLessons = payload.completedLessons || 0;
       const isCompleted = payload.isCompleted || false;
