@@ -34,27 +34,19 @@ export default async function ({ req, res, log, error }: any) {
     .setKey(appwriteConfig.apiKey);
 
   try {
-    // Directly use req.body if the event is not found in req.variables
-    const payload = req.body || {}; // Assuming the data is sent directly in the body of the request
-
-    // Log the payload to check if it contains the expected data
-
-    // Check if the event includes your collection and event type
-    const event = req.headers["x-appwrite-event"] || ""; // Alternatively, check headers for event info
+    const payload = req.body || {};
+    const event = req.headers["x-appwrite-event"] || "";
 
     if (
       event.includes(
         `collections.${appwriteConfig.userCoursesCollectionId}.documents`
       )
     ) {
-      log("Event:", event);
-      log("Payload:", payload);
       const userId = payload.user;
       const courseId = payload.course;
       const completedLessons = payload.completedLessons || 0;
       const isCompleted = payload.isCompleted || false;
 
-      // Fetch the user's growth summary
       const growthSummaryResponse = await databases.listDocuments(
         appwriteConfig.databaseId,
         appwriteConfig.grownthCollectionId,
@@ -62,9 +54,16 @@ export default async function ({ req, res, log, error }: any) {
       );
 
       let growthSummary = growthSummaryResponse.documents[0];
+      const today = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
 
       if (growthSummary) {
-        // Update existing growth summary
+        const lastActivityDate = growthSummary.lastActivityDate
+          ? growthSummary.lastActivityDate.split("T")[0]
+          : null;
+
+        // Check if the user is active on a new day
+        const isNewDay = lastActivityDate !== today;
+
         await databases.updateDocument(
           appwriteConfig.databaseId,
           appwriteConfig.grownthCollectionId,
@@ -75,11 +74,10 @@ export default async function ({ req, res, log, error }: any) {
             totalCoursesCompleted:
               growthSummary.totalCoursesCompleted + (isCompleted ? 1 : 0),
             lastActivityDate: new Date().toISOString(),
-            daysActive: growthSummary.daysActive + 1,
+            daysActive: growthSummary.daysActive + (isNewDay ? 1 : 0), // Increment daysActive only if it's a new day
           }
         );
       } else {
-        // Create a new growth summary record
         await databases.createDocument(
           appwriteConfig.databaseId,
           appwriteConfig.grownthCollectionId,
@@ -88,9 +86,9 @@ export default async function ({ req, res, log, error }: any) {
             userId,
             totalLessonsCompleted: completedLessons,
             totalCoursesCompleted: isCompleted ? 1 : 0,
-            totalTimeSpent: 0, // Set to zero or calculate from other data
+            totalTimeSpent: 0,
             lastActivityDate: new Date().toISOString(),
-            daysActive: 1,
+            daysActive: 1, // First activity starts at 1 day
           }
         );
       }
